@@ -1,0 +1,4 @@
+smolagents[openai]==1.26.0
+openai==3.25.0
+pydantic==2.13.5
+httpx==0.28.1
