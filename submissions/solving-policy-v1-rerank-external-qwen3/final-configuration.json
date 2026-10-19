@@ -1,0 +1,26 @@
+{
+  "variants": [
+    [
+      "passages",
+      "passages"
+    ],
+    [
+      "passages",
+      "qwen3"
+    ],
+    [
+      "rerank",
+      "passages"
+    ],
+    [
+      "rerank",
+      "qwen3"
+    ]
+  ],
+  "final_output_tokens": 4096,
+  "local_reranking_output_tokens": 2048,
+  "gpt_oss_reasoning_effort": "low",
+  "final_decoding": "native JSON schema",
+  "policies_changed": false,
+  "starting_point": "/home/krishna/uniagent-runs/code/solving-policy-v1-external-json-v2"
+}

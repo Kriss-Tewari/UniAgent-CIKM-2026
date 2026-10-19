@@ -1,0 +1,26 @@
+{
+  "variant": "solving-policy-v1-rerank-external-passages",
+  "local_mode": "rerank",
+  "external_mode": "passages",
+  "max_output_tokens": 4096,
+  "decision_model_configuration": "environment variables",
+  "gpt_oss_default_reasoning_effort": "low",
+  "reranker_model": null,
+  "reranker_revision": null,
+  "native_package_versions": {
+    "python-terrier": "1.0",
+    "pyterrier": "1.1.2",
+    "pyterrier-alpha": "0.16.5",
+    "numpy": "2.3.5",
+    "pandas": "3.0.6",
+    "smolagents": "1.26.0",
+    "openai": "3.25.0",
+    "pydantic": "2.13.5",
+    "httpx": "0.28.1",
+    "torch": "2.13.0+cu132",
+    "transformers": "5.17.0",
+    "huggingface-hub": "1.33.0",
+    "safetensors": "0.8.0"
+  },
+  "source_directory": "/home/krishna/uniagent-runs/code/solving-policy-v1-external-final"
+}
