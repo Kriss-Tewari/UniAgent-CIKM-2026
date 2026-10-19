@@ -1,0 +1,81 @@
+name: Upload policy-v1 passages to TIRA
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: tira-policy-v1-passages-upload
+  cancel-in-progress: false
+
+jobs:
+  upload:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    env:
+      TIRA_CLIENT_TOKEN: ${{ secrets.TIRA_CLIENT_TOKEN }}
+      SUBMISSION_IMAGE: uniagent-policy-v1-passages:${{ github.sha }}
+      TERM: xterm
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+
+      - name: Check TIRA secret
+        shell: bash
+        run: |
+          if [ -z "$TIRA_CLIENT_TOKEN" ]; then
+            echo "::error::Add the TIRA_CLIENT_TOKEN repository secret."
+            exit 1
+          fi
+
+      - name: Verify agent source checksums
+        run: |
+          python - <<'CHECKS'
+          import hashlib
+          import json
+          from pathlib import Path
+
+          root = Path("submissions/solving-policy-v1-passages")
+          expected = json.loads((root / "source-checksums.json").read_text())
+          for name, digest in expected.items():
+              data = (root / name).read_bytes()
+              assert hashlib.sha256(data).hexdigest() == digest, name
+              compile(data, str(root / name), "exec")
+          print("Agent source checksums and syntax verified.")
+          CHECKS
+
+      - name: Install TIRA client
+        run: python -m pip install "tira==0.0.205"
+
+      - name: Authenticate and verify TIRA installation
+        run: |
+          tira-cli login --token "$TIRA_CLIENT_TOKEN"
+          tira-cli verify-installation --task uniagent-2026 --team rhineganga
+
+      - name: Build agent image
+        run: |
+          docker build --platform linux/amd64 \
+            --tag "$SUBMISSION_IMAGE" \
+            submissions/solving-policy-v1-passages
+
+      - name: Check container dependencies
+        run: |
+          docker run --rm --entrypoint pdftotext "$SUBMISSION_IMAGE" -v
+          docker run --rm --entrypoint python "$SUBMISSION_IMAGE" \
+            -m pip check
+          docker run --rm --entrypoint python "$SUBMISSION_IMAGE" \
+            -c 'import smolagents, openai, case_tools, event_logging, passage_focus, predict; print("Agent imports passed.")'
+
+      - name: Check prediction command
+        run: docker run --rm "$SUBMISSION_IMAGE" --help
+
+      - name: Upload and register with TIRA
+        run: python ci/upload_policy_v1_passages.py
