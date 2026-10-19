@@ -35,12 +35,40 @@ def main():
     client = Client(api_key=os.environ["TIRA_CLIENT_TOKEN"])
     client.fail_if_api_key_is_invalid()
 
+
+    image = os.environ["SUBMISSION_IMAGE"]
+    code = {
+        "solving-policy-v1-passages-external-passages": "pp",
+        "solving-policy-v1-passages-external-qwen3": "pq",
+        "solving-policy-v1-rerank-external-passages": "rp",
+        "solving-policy-v1-rerank-external-qwen3": "rq",
+    }[variant]
+
+    expected_tag = f"{commit}-{code}"
+    expected_local_image = f"t2{code}:{expected_tag}"
+    if image != expected_local_image:
+        raise RuntimeError(f"Unexpected image name: {image}")
+
+    registry_prefix = (
+        client.docker_registry().rstrip("/")
+        + "/code-research/tira/tira-user-rhineganga/"
+    )
+    expected_registry_image = client.local_execution.normalize_image_name(
+        image, registry_prefix
+    )
+    if not expected_registry_image.endswith(f"/t2{code}:{expected_tag}"):
+        raise RuntimeError("Registry image normalization is not variant-specific.")
+    print("Verified distinct registry image:", expected_registry_image)
+
     uploaded_image = push_image(
         client,
         os.environ["SUBMISSION_IMAGE"],
         "uniagent-2026",
         "rhineganga",
     )
+
+    if uploaded_image != expected_registry_image:
+        raise RuntimeError("Uploaded image differs from the verified registry name.")
 
     result = client.add_docker_software(
         image=uploaded_image,

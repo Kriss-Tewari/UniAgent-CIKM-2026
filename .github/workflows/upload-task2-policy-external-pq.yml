@@ -17,7 +17,7 @@ jobs:
 
     env:
       TIRA_CLIENT_TOKEN: ${{ secrets.TIRA_CLIENT_TOKEN }}
-      SUBMISSION_IMAGE: uniagent-policy-external-pq:${{ github.sha }}
+      SUBMISSION_IMAGE: t2pq:${{ github.sha }}-pq
       SUBMISSION_DIRECTORY: submissions/solving-policy-v1-passages-external-qwen3
       TERM: xterm
 
