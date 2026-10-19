@@ -5,6 +5,7 @@ COPY domain_dictionary.json components.py submission.py test_submission.py /app/
 COPY neural_reranking.py test_neural_reranking.py requirements-neural.txt /app/
 RUN python -m pip install --no-cache-dir -r requirements-neural.txt
 # Download weights with download_model.py BEFORE building. Runtime loads local files only.
-COPY models/qwen3-reranker /app/models/qwen3-reranker
+COPY download_model.py /app/download_model.py
+RUN python /app/download_model.py --output /app/models/qwen3-reranker
 RUN PYTHONPATH=. pytest .
 ENTRYPOINT ["python", "/app/submission.py"]
