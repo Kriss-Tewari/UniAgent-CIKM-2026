@@ -18,9 +18,28 @@ def main():
     client = Client(api_key=token)
     client.fail_if_api_key_is_invalid()
 
+
+    expected_local_image = "lrv1:" + commit + "-rerank"
+    if image != expected_local_image:
+        raise RuntimeError("Unexpected local image name: " + image)
+
+    registry_prefix = (
+        client.docker_registry().rstrip("/")
+        + "/code-research/tira/tira-user-rhineganga/"
+    )
+    expected_registry_image = client.local_execution.normalize_image_name(
+        image, registry_prefix
+    )
+    if not expected_registry_image.endswith("/" + expected_local_image):
+        raise RuntimeError("Registry normalization changed the unique image name.")
+    print("Verified distinct registry image:", expected_registry_image)
+
     uploaded_image = push_image(
         client, image, "uniagent-2026", "rhineganga"
     )
+
+    if uploaded_image != expected_registry_image:
+        raise RuntimeError("Uploaded image differs from the verified name.")
 
     command = (
         "/run.sh --input $inputDataset --output $outputDir"

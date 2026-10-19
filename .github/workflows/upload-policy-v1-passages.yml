@@ -16,7 +16,7 @@ jobs:
     timeout-minutes: 45
     env:
       TIRA_CLIENT_TOKEN: ${{ secrets.TIRA_CLIENT_TOKEN }}
-      SUBMISSION_IMAGE: uniagent-policy-v1-passages:${{ github.sha }}
+      SUBMISSION_IMAGE: lpv1:${{ github.sha }}-passages
       TERM: xterm
 
     steps:

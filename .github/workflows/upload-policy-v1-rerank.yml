@@ -16,7 +16,7 @@ jobs:
     timeout-minutes: 45
     env:
       TIRA_CLIENT_TOKEN: ${{ secrets.TIRA_CLIENT_TOKEN }}
-      SUBMISSION_IMAGE: uniagent-policy-v1-rerank:${{ github.sha }}
+      SUBMISSION_IMAGE: lrv1:${{ github.sha }}-rerank
       TERM: xterm
 
     steps:
