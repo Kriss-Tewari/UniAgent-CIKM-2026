@@ -302,4 +302,9 @@ def main(dataset: str, output: Path, reranker: str, model_path: str,
 
 
 if __name__ == "__main__":
+    import faulthandler
+
+    faulthandler.enable()
+    faulthandler.dump_traceback_later(120, repeat=True)
+    print("Starting retrieval submission", flush=True)
     main()
