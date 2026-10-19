@@ -1,0 +1,44 @@
+--- original/submission.py
++++ modified/submission.py
+@@ -20,7 +20,8 @@
+     input -> route_collection -> formulate_query -> [expand_with_dictionary] -> pyterrier_retrieve
+           -> [cosine_rerank] -> observation -> decision
+ A failing step is logged with status "error", followed by an error decision, before the
+-exception propagates. No relevance judgments, no network, no LLM, no embeddings.
++exception propagates. The first stage is unchanged. Optional local Qwen3 reranking uses a neural model,
++with local-only weights and no relevance judgments or runtime network requests.
+ """
+ 
+ from __future__ import annotations
+@@ -260,8 +261,17 @@
+ @click.command()
+ @click.option("--dataset", required=True, help="Dataset directory or TIRA dataset ID")
+ @click.option("--output", required=True, type=click.Path(path_type=Path, file_okay=False))
+-def main(dataset: str, output: Path) -> None:
++@click.option("--reranker", type=click.Choice(["none", "qwen3"]), default="none", show_default=True)
++@click.option("--model-path", default="models/qwen3-reranker", show_default=True)
++@click.option("--rerank-depth", type=click.IntRange(min=1), default=20, show_default=True)
++@click.option("--device", type=click.Choice(["cpu", "cuda", "auto"]), default="cpu", show_default=True)
++@click.option("--max-length", type=click.IntRange(min=256,max=32768), default=1536, show_default=True)
++@click.option("--batch-size", type=click.IntRange(min=1), default=1, show_default=True)
++def main(dataset: str, output: Path, reranker: str, model_path: str,
++         rerank_depth: int, device: str, max_length: int, batch_size: int) -> None:
+     """Recognise the collection and run its system."""
++    if reranker == "qwen3" and (output / "run.first-stage.txt.gz").exists():
++        raise click.ClickException("Use a fresh output folder for a full pipeline run; to rerank an existing source use neural_reranking.py.")
+     ds = ir_datasets.load(dataset)
+     output.mkdir(parents=True, exist_ok=True)
+     try:
+@@ -283,6 +293,12 @@
+               "uses_relevance_judgments": False, "uses_llm": False, "uses_embeddings": False}
+     (output / "retrieval_config.json").write_text(json.dumps(config, indent=2), encoding="utf-8")
+     click.echo(f"{name}: {config['retrieved_rows']} results -> {output / 'run.txt.gz'}")
++    if reranker == "qwen3":
++        from neural_reranking import rerank_dataset
++        click.echo("Starting offline Qwen3 reranking; original ranks will be preserved.")
++        rerank_dataset(dataset, output, model_path, depth=rerank_depth,
++                       device=device, max_length=max_length, batch_size=batch_size)
++        click.echo(f"Reranked results -> {output / 'run.txt.gz'}")
+ 
+ 
+ if __name__ == "__main__":

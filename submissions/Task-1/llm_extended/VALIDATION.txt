@@ -1,0 +1,9 @@
+PASS: Syntax compilation of all Python files.
+PASS: 4 model-free unittest tests in test_neural_reranking.py.
+Checks: stable ties; retained candidate membership and tail order; consecutive ranks
+and decreasing scores; rejection of duplicate run entries/non-finite model scores;
+late relevant passage selection; simulated full stage-two run and backup handling;
+linked non-colliding trace IDs; narrative exclusion; failure leaves ranking intact.
+UNTESTED: actual Qwen3 checkpoint inference; model downloads; GPU/CPU speed and peak
+memory; full original PyTerrier tests; Docker build; TIRA execution; real qrels.
+No measured improvement claim is made.
