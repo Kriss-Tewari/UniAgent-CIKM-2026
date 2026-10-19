@@ -244,6 +244,7 @@ def rerank_dataset(dataset, output, model_path, depth=20, device='cpu', max_leng
         new_trace = output / 'trace.complete.tmp.gz'
         new_trace.write_bytes(base_trace.read_bytes() + temp_trace.read_bytes())
         os.replace(new_trace, trace_path)
+        temp_run.chmod(0o644)
         os.replace(temp_run, run_path)
         (output / 'rerank_scores.json').write_text(json.dumps(details, ensure_ascii=False, indent=2), encoding='utf-8')
         cfg_path = output / 'retrieval_config.json'
