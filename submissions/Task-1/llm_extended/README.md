@@ -1,5 +1,5 @@
 # Retrieval: Collection-Routed Retrieval + Qwen3 Reranking
-UniAgent 2026 (CIKM’26), Task 1. Extends collection-specific lexical retrieval with optional Qwen3-Reranker-0.6B reranking.
+ Task 1. Extends collection-specific lexical retrieval with optional Qwen3-Reranker-0.6B reranking.
 # What happens
 1. Detect the dataset language and collection.
 2. Retrieve documents using dictionary-expanded BM25, DPH or BM25F, depending on the collection.
