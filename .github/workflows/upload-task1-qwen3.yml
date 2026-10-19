@@ -48,4 +48,4 @@ jobs:
             --task uniagent-2026 \
             --tira-vm-id rhineganga \
             --dataset retrieval-de-spot-check-20260816-training \
-            --command 'python3 /app/submission.py --dataset "$inputDataset" --output "$outputDir" --reranker qwen3 --model-path /app/models/qwen3-reranker --device cpu --rerank-depth 20'
+            --command 'python3 -u /app/submission.py --dataset "$inputDataset" --output "$outputDir" --reranker qwen3 --model-path /app/models/qwen3-reranker --device cpu --rerank-depth 20'
